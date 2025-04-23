@@ -1,7 +1,8 @@
+// swift-tools-version:5.8
 import PackageDescription
 
 let package = Package(
-    name: "HawcxSDK",
+    name: "hawcx_ios_sdk", 
     platforms: [
         .iOS(.v17)
     ],
