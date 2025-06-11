@@ -1,27 +1,36 @@
-# Hawcx iOS SDK
+# Hawcx iOS SDK V4
 
-Hawcx provides enterprise-grade passwordless authentication for iOS applications, delivering a secure and frictionless login experience across all user devices.
+Hawcx provides enterprise-grade passwordless authentication for iOS applications, delivering a secure and frictionless login experience across all user devices with a unified authentication API.
 
-[![Swift Version](https://img.shields.io/badge/Swift-5.0+-orange.svg)](https://swift.org)
-
-[![Platform](https://img.shields.io/badge/platform-iOS_17.0+-blue.svg)](https://developer.apple.com/ios/)
-
+[![Swift Version](https://img.shields.io/badge/Swift-5.9+-orange.svg)](https://swift.org)
+[![Platform](https://img.shields.io/badge/platform-iOS_14.0+-blue.svg)](https://developer.apple.com/ios/)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
-
 [![Swift Package Manager](https://img.shields.io/badge/SPM-compatible-brightgreen.svg)](https://swift.org/package-manager)
+
+## What's New in V4
+
+### 🚀 Unified Authentication API
+- **Single method for everything** - `authenticateV4()` handles login, signup, and device registration
+- **Intelligent flow detection** - SDK automatically determines the appropriate authentication flow
+- **Simplified integration** - Reduce complexity with fewer methods and callbacks to manage
+
+### 🔄 Enhanced User Experience
+- **Seamless transitions** - Automatic progression from device registration to login
+- **Better error handling** - More specific error codes with actionable error messages
+- **Automatic session management** - JWT tokens managed securely in Keychain
 
 ## Table of Contents
 
 - [Installation](#installation)
 - [Getting Started](#getting-started)
 - [Core Features](#core-features)
-  - [User Registration](#user-registration)
-  - [User Authentication](#user-authentication)
+  - [Unified Authentication](#unified-authentication)
   - [Biometric Authentication](#biometric-authentication)
-  - [Device Session Management](#device-session-management)
+  - [Session Management](#session-management)
 - [Advanced Features](#advanced-features)
-  - [Multi-Device Support](#multi-device-support)
+  - [Web Authentication](#web-authentication)
   - [Error Handling](#error-handling)
+- [Migration from V3](#migration-from-v3)
 - [API Reference](#api-reference)
 - [Samples & Resources](#samples--resources)
 
@@ -29,198 +38,288 @@ Hawcx provides enterprise-grade passwordless authentication for iOS applications
 
 ### Requirements
 - iOS 14.0+
-- Swift 5.0+
+- Swift 5.9+
 
-### Swift Package Manager
+### Swift Package Manager (Recommended)
+
+1. In Xcode, go to **File** → **Add Package Dependencies...**
+2. Enter the repository URL: `https://github.com/hawcx/hawcx-sdk-ios`
+3. Select **Up to Next Major Version** and enter `4.0.0`
+4. Choose **HawcxFramework** and click **Add Package**
+
+### Package.swift
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/hawcx/hawcx_ios_sdk.git", .upToNextMajor(from: "1.0.0"))
+    .package(url: "https://github.com/hawcx/hawcx-sdk-ios", from: "4.0.0")
 ]
 ```
 
 ### Manual Installation
 
-1. Download the latest [HawcxSDK.xcframework](https://github.com/hawcx/hawcx_ios_sdk/releases/latest)
-2. Add to your project and set "Embed & Sign" in the "Frameworks, Libraries, and Embedded Content" section
+1. Download the latest [HawcxFramework.xcframework](https://github.com/hawcx/hawcx-sdk-ios/releases/latest)
+2. Drag the XCFramework into your project
+3. Set "Embed & Sign" in "Frameworks, Libraries, and Embedded Content"
 
 ## Getting Started
 
 ### Initialize the SDK
 
 ```swift
-import HawcxSDK
+import HawcxFramework
 
-// In your AppDelegate or SceneDelegate
-func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-    HawcxInitializer.shared.initialize(apiKey: "YOUR_API_KEY")
-    return true
+// Initialize the SDK (no global initialization required)
+let sdk = HawcxSDK(projectApiKey: "YOUR_API_KEY")
+```
+
+### Basic Authentication Flow
+
+```swift
+class AuthenticationController: UIViewController, AuthV4Callback {
+    private let sdk = HawcxSDK(projectApiKey: "YOUR_API_KEY")
+    
+    func authenticateUser(email: String) {
+        // Single method handles all authentication scenarios
+        sdk.authenticateV4(userid: email, callback: self)
+    }
+    
+    // MARK: - AuthV4Callback
+    func onOtpRequired() {
+        // Show OTP input UI - user needs to verify email
+        showOTPInput()
+    }
+    
+    func onAuthSuccess(accessToken: String?, refreshToken: String?, isLoginFlow: Bool) {
+        if isLoginFlow {
+            // User successfully logged in
+            navigateToHomeScreen()
+        } else {
+            // Device registration completed, login will happen automatically
+            showMessage("Device registered successfully")
+        }
+    }
+    
+    func onError(errorCode: AuthV4ErrorCode, errorMessage: String) {
+        // Handle authentication errors
+        showError(message: errorMessage)
+    }
+    
+    func submitOTP(_ otp: String) {
+        sdk.submitOtpV4(otp: otp)
+    }
 }
 ```
 
 ## Core Features
 
-### User Registration
+### Unified Authentication
 
-Register new users with a simple, secure process.
-
-```swift
-// Initialize the SignUp manager
-let signUp = SignUp(apiKey: "YOUR_API_KEY")
-
-// Start registration process
-signUp.signUp(userid: "user@example.com", callback: self)
-
-// MARK: - SignUpCallback methods
-func onGenerateOTPSuccess() {
-    // Show OTP verification UI
-}
-
-func handleVerifyOTP(otp: String) {
-    signUp.handleVerifyOTP(otp: otp, callback: self)
-}
-
-func onSuccessfulSignUp() {
-    // Registration complete, proceed to home screen
-}
-
-func showError(signUpErrorCode: SignUpErrorCode, errorMessage: String) {
-    // Handle specific error
-}
-```
-
-### User Authentication
-
-Authenticate returning users with a passwordless flow.
+V4 uses a single method for all authentication scenarios:
 
 ```swift
-// Initialize the SignIn manager
-let signIn = SignIn(apiKey: "YOUR_API_KEY")
+// Handles all cases automatically:
+// - New user registration
+// - Existing user login  
+// - New device registration
+sdk.authenticateV4(userid: "user@example.com", callback: self)
 
-// Authenticate user
-signIn.signIn(userid: "user@example.com", callback: self)
-
-// MARK: - SignInCallback methods
-func onSuccessfulLogin(_ email: String) {
-    // User authenticated successfully
-}
-
-func navigateToRegistration(for email: String) {
-    // User doesn't exist, show registration
-}
-
-func initiateAddDeviceRegistrationFlow(for email: String) {
-    // This device needs to be added to the user's account
-}
-
-func showError(signInErrorCode: SignInErrorCode, errorMessage: String) {
-    // Handle specific error
-}
+// Submit OTP when required
+sdk.submitOtpV4(otp: "123456")
 ```
+
+**Authentication Flow Logic:**
+- **New user**: `onOtpRequired()` → Registration → Auto-login
+- **Existing user, known device**: Direct `onAuthSuccess()` 
+- **Existing user, new device**: `onOtpRequired()` → Device registration → Auto-login
 
 ### Biometric Authentication
 
-Enhance security with Face ID or Touch ID integration.
+Integrate Face ID and Touch ID seamlessly:
 
 ```swift
 import LocalAuthentication
 
-func authenticateWithBiometrics(username: String) {
-    let context = LAContext()
-    var error: NSError?
+class BiometricAuthController {
+    private let sdk = HawcxSDK(projectApiKey: "YOUR_API_KEY")
     
-    if context.canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: &error) {
-        context.evaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, 
-                              localizedReason: "Log in to your account") { success, error in
+    func authenticateWithBiometrics(username: String) {
+        let biometricService = BiometricService()
+        
+        biometricService.authenticate { [weak self] success, error in
             if success {
-                // Proceed with Hawcx authentication
-                self.signIn.signIn(userid: username, callback: self)
+                // Proceed with Hawcx authentication after biometric success
+                self?.sdk.authenticateV4(userid: username, callback: self)
             } else {
-                // Handle biometric authentication error
+                // Handle biometric failure
+                print("Biometric authentication failed: \(error?.localizedDescription ?? "Unknown error")")
+            }
+        }
+    }
+}
+
+// BiometricService helper class
+class BiometricService {
+    func authenticate(completion: @escaping (Bool, Error?) -> Void) {
+        let context = LAContext()
+        var error: NSError?
+        
+        guard context.canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: &error) else {
+            completion(false, error)
+            return
+        }
+        
+        context.evaluatePolicy(.deviceOwnerAuthenticationWithBiometrics,
+                              localizedReason: "Authenticate to access your account") { success, error in
+            DispatchQueue.main.async {
+                completion(success, error)
             }
         }
     }
 }
 ```
 
-> **Important:** Add `NSFaceIDUsageDescription` to your Info.plist to enable Face ID authentication.
+> **Important:** Add `NSFaceIDUsageDescription` to your Info.plist for Face ID support.
 
-### Device Session Management
+### Session Management
 
-Fetch and manage information about user sessions across devices.
+V4 provides enhanced session management with granular control:
 
 ```swift
-// Initialize DevSession manager
-let devSession = DevSession(apiKey: "YOUR_API_KEY")
-
-// Fetch device details
-devSession.GetDeviceDetails(callback: self)
-
-// MARK: - DevSessionCallback methods
-func onSuccess() {
-    // Access device information from UserDefaults
-    if let data = UserDefaults.standard.data(forKey: "devDetails") {
-        let decoder = JSONDecoder()
-        let devices = try? decoder.decode([DeviceSessionInfo].self, from: data)
-        // Use devices data
-    }
+// Get last logged in user for UI pre-filling
+let lastUser = sdk.getLastLoggedInUser()
+if !lastUser.isEmpty {
+    emailField.text = lastUser
 }
 
-func showError() {
-    // Handle error
-}
+// Standard logout - keeps device registration, clears session tokens
+sdk.clearSessionTokens(forUser: "user@example.com")
+
+// Full device removal - user must re-register this device
+sdk.clearUserKeychainData(forUser: "user@example.com")
+
+// Clear last logged in user marker (for UI pre-fill)
+sdk.clearLastLoggedInUser()
 ```
 
 ## Advanced Features
 
-### Multi-Device Support
+### Web Authentication
 
-Enable users to securely access their accounts across multiple devices.
+Support QR code and PIN-based web authentication:
 
 ```swift
-// Initialize the AddDeviceManager
-let addDeviceManager = AddDeviceManager(apiKey: "YOUR_API_KEY")
-
-// Start the Add Device flow
-addDeviceManager.startAddDeviceFlow(userid: "user@example.com", callback: self)
-
-// MARK: - AddDeviceCallback methods
-func onGenerateOTPSuccess() {
-    // Show OTP verification UI
+class WebAuthController {
+    private let sdk = HawcxSDK(projectApiKey: "YOUR_API_KEY")
+    
+    // Step 1: Submit PIN from web login
+    func submitWebLoginPIN(_ pin: String) {
+        sdk.webLogin(pin: pin, callback: self)
+    }
+    
+    // Step 2: Approve the web login request
+    func approveWebLogin(webToken: String) {
+        sdk.webApprove(token: webToken, callback: self)
+    }
 }
 
-func handleVerifyOTP(otp: String) {
-    addDeviceManager.handleVerifyOTP(otp: otp)
-}
-
-func onAddDeviceSuccess() {
-    // Device successfully added, proceed to home screen
-}
-
-func showError(addDeviceErrorCode: AddDeviceErrorCode, errorMessage: String) {
-    // Handle specific error
+extension WebAuthController: WebLoginCallback {
+    func onWebLoginSuccess() {
+        // Web login PIN submitted successfully
+        showMessage("Web login initiated")
+    }
+    
+    func onWebApproveSuccess() {
+        // Web login approved successfully
+        showMessage("Web login approved")
+    }
+    
+    func onWebLoginError(errorCode: WebLoginErrorCode, errorMessage: String) {
+        // Handle web authentication errors
+        showError(message: errorMessage)
+    }
 }
 ```
 
 ### Error Handling
 
-Implement robust error handling for different scenarios.
+V4 provides comprehensive error codes for better user experience:
 
 ```swift
-func showError(signInErrorCode: SignInErrorCode, errorMessage: String) {
-    switch signInErrorCode {
-    case .userNotFound:
-        // Show registration option
-        
-    case .addDeviceRequired:
-        // Redirect to Add Device flow
-        
+func onError(errorCode: AuthV4ErrorCode, errorMessage: String) {
+    switch errorCode {
     case .networkError:
-        // Show connectivity error
+        showRetryableError("Please check your internet connection")
+        
+    case .otpVerificationFailed:
+        showError("Invalid verification code. Please try again.")
+        
+    case .deviceVerificationFailed:
+        showError("Device verification failed. Please try again.")
+        
+    case .fingerprintError:
+        showError("Biometric authentication is not available")
+        
+    case .keychainSaveFailed:
+        showError("Failed to save authentication data securely")
+        
+    case .authInitFailed:
+        showError("Authentication initialization failed")
+        
+    case .cipherVerificationFailed:
+        showError("Login verification failed")
+        
+    case .missingDeviceTokenSession:
+        showError("Session expired. Please try again.")
+        
+    case .internalStateError:
+        showError("An unexpected error occurred. Please update the app.")
         
     default:
-        // Handle other errors
+        showError("Authentication failed: \(errorMessage)")
     }
+}
+```
+
+## Migration from V3
+
+
+### Before (V3):
+```swift
+// V3 required multiple managers and initialization
+HawcxInitializer.shared.initialize(apiKey: "YOUR_API_KEY")
+
+let signUp = SignUp(apiKey: "YOUR_API_KEY")
+let signIn = SignIn(apiKey: "YOUR_API_KEY") 
+let addDevice = AddDeviceManager(apiKey: "YOUR_API_KEY")
+
+// Different methods for different scenarios
+signUp.signUp(userid: email, callback: self)
+signIn.signIn(userid: email, callback: self)
+addDevice.startAddDeviceFlow(userid: email, callback: self)
+```
+
+### After (V4):
+```swift
+// V4 uses single SDK instance and method
+let sdk = HawcxSDK(projectApiKey: "YOUR_API_KEY")
+
+// One method handles all scenarios
+sdk.authenticateV4(userid: email, callback: self)
+```
+
+### Callback Migration
+
+**V3 had multiple callback protocols:**
+- `SignUpCallback`
+- `SignInCallback` 
+- `AddDeviceCallback`
+
+**V4 uses unified `AuthV4Callback`:**
+```swift
+protocol AuthV4Callback: AnyObject {
+    func onOtpRequired()
+    func onAuthSuccess(accessToken: String?, refreshToken: String?, isLoginFlow: Bool)
+    func onError(errorCode: AuthV4ErrorCode, errorMessage: String)
 }
 ```
 
@@ -228,97 +327,90 @@ func showError(signInErrorCode: SignInErrorCode, errorMessage: String) {
 
 ### Core Classes
 
-#### SignUp
+#### HawcxSDK
 | Method | Description |
 | ------ | ----------- |
-| `init(apiKey: String)` | Initialize with your API key |
-| `signUp(userid: String, callback: SignUpCallback)` | Start the registration process |
-| `handleVerifyOTP(otp: String, callback: SignUpCallback)` | Verify the OTP during registration |
-
-#### SignIn
-| Method | Description |
-| ------ | ----------- |
-| `init(apiKey: String)` | Initialize with your API key |
-| `signIn(userid: String, callback: SignInCallback)` | Authenticate a user |
-
-#### AddDeviceManager
-| Method | Description |
-| ------ | ----------- |
-| `init(apiKey: String)` | Initialize with your API key |
-| `startAddDeviceFlow(userid: String, callback: AddDeviceCallback)` | Start the device addition flow |
-| `handleVerifyOTP(otp: String)` | Verify the OTP during device addition |
-
-#### DevSession
-| Method | Description |
-| ------ | ----------- |
-| `init(apiKey: String)` | Initialize with your API key |
-| `GetDeviceDetails(callback: DevSessionCallback)` | Fetch device session details |
+| `init(projectApiKey: String)` | Initialize SDK with your API key |
+| `authenticateV4(userid: String, callback: AuthV4Callback)` | Unified authentication method |
+| `submitOtpV4(otp: String)` | Submit OTP during verification |
+| `getLastLoggedInUser() -> String` | Get last logged in user for UI pre-fill |
+| `clearSessionTokens(forUser: String)` | Standard logout (keeps device registration) |
+| `clearUserKeychainData(forUser: String)` | Full device removal |
+| `clearLastLoggedInUser()` | Clear last user marker |
+| `webLogin(pin: String, callback: WebLoginCallback)` | Submit web login PIN |
+| `webApprove(token: String, callback: WebLoginCallback)` | Approve web login |
 
 ### Callback Protocols
 
-#### SignUpCallback
+#### AuthV4Callback
 ```swift
-public protocol SignUpCallback {
-    func showError(signUpErrorCode: SignUpErrorCode, errorMessage: String)
-    func onSuccessfulSignUp()
-    func onGenerateOTPSuccess()
+public protocol AuthV4Callback: AnyObject {
+    func onOtpRequired()
+    func onAuthSuccess(accessToken: String?, refreshToken: String?, isLoginFlow: Bool)
+    func onError(errorCode: AuthV4ErrorCode, errorMessage: String)
 }
 ```
 
-#### SignInCallback
+#### WebLoginCallback
 ```swift
-public protocol SignInCallback {
-    func showError(signInErrorCode: SignInErrorCode, errorMessage: String)
-    func onSuccessfulLogin(_ email: String)
-    func navigateToRegistration(for email: String)
-    func initiateAddDeviceRegistrationFlow(for email: String)
+public protocol WebLoginCallback: AnyObject {
+    func onWebLoginSuccess()
+    func onWebApproveSuccess() 
+    func onWebLoginError(errorCode: WebLoginErrorCode, errorMessage: String)
 }
 ```
 
-#### AddDeviceCallback
-```swift
-public protocol AddDeviceCallback {
-    func showError(addDeviceErrorCode: AddDeviceErrorCode, errorMessage: String)
-    func onAddDeviceSuccess()
-    func onGenerateOTPSuccess()
-}
-```
+### Error Codes
 
-#### DevSessionCallback
-```swift
-public protocol DevSessionCallback {
-    func onSuccess()
-    func showError()
-}
-```
+#### AuthV4ErrorCode
+- `networkError` - Connectivity issues
+- `otpVerificationFailed` - Invalid OTP
+- `deviceVerificationFailed` - Device registration failed
+- `fingerprintError` - Biometric authentication unavailable
+- `keychainSaveFailed` - Secure storage failed
+- `authInitFailed` - Authentication initialization failed
+- `cipherVerificationFailed` - Login verification failed
+- `missingDeviceTokenSession` - Session token lost
+- `internalStateError` - Unexpected SDK state
 
 ## Samples & Resources
 
-### Sample App
+### Demo Application
 
-Explore our [sample application](https://github.com/hawcx/hawcx_ios_demo) for complete implementations of:
-- User registration
-- Authentication
-- Multi-device support
-- Web login approval
+Explore our [V4 demo application](https://github.com/hawcx/hawcx-ios-demo) featuring:
+- Unified authentication implementation
+- Biometric integration
 - Session management
+- Web authentication
+- Modern SwiftUI architecture
+- Complete error handling
 
-### Common Patterns
+### Best Practices
 
-#### Automatic Login After Registration
+#### Biometric Authentication Flow
 ```swift
-func onSuccessfulSignUp() {
-    // Auto-login after registration
-    signIn.signIn(userid: email, callback: loginCallback)
+func attemptBiometricLogin() {
+    guard let lastUser = getLastUser(), biometricsEnabled(for: lastUser) else { return }
+    
+    authenticateWithBiometrics(username: lastUser) { [weak self] success in
+        if success {
+            self?.sdk.authenticateV4(userid: lastUser, callback: self)
+        }
+    }
 }
 ```
 
-#### Handling Device Addition During Login
+#### Session State Management
 ```swift
-func initiateAddDeviceRegistrationFlow(for email: String) {
-    // Navigate to add device screen
-    let addDeviceVC = AddDeviceViewController(email: email)
-    navigationController?.pushViewController(addDeviceVC, animated: true)
+func handleAuthSuccess(isLoginFlow: Bool) {
+    if isLoginFlow {
+        // User is now logged in
+        updateUIForLoggedInState()
+        navigateToHomeScreen()
+    } else {
+        // Device was registered, login will happen automatically
+        showTemporaryMessage("Device registered successfully")
+    }
 }
 ```
 

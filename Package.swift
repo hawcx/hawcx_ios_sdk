@@ -8,14 +8,14 @@ let package = Package(
     ],
     products: [
         .library(
-            name: "HawcxSDK",
+            name: "HawcxFramework",
             targets: ["HawcxFramework"]),
     ],
     targets: [
         .binaryTarget(
             name: "HawcxFramework",
-            url: "https://github.com/hawcx/hawcx_ios_sdk/releases/download/1.0.2/HawcxFramework.xcframework.zip",
-            checksum: "a8d7279575ba3e65e3f061513a59149c6ddfe22309a996e7819136de92613e6a"
+            url: "https://github.com/hawcx/hawcx_ios_sdk/releases/download/4.0.1/HawcxFramework.xcframework.zip",
+            checksum: "dc54a7ae0c9881bd5ee271fd37ca6b18b775ff92a7982c18ecb2aae509618b80"
         )
     ]
 )
