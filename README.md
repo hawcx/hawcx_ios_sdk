@@ -43,21 +43,21 @@ Hawcx provides enterprise-grade passwordless authentication for iOS applications
 ### Swift Package Manager (Recommended)
 
 1. In Xcode, go to **File** → **Add Package Dependencies...**
-2. Enter the repository URL: `https://github.com/hawcx/hawcx-sdk-ios`
-3. Select **Up to Next Major Version** and enter `4.0.0`
+2. Enter the repository URL: `https://github.com/hawcx/hawcx_ios_sdk.git`
+3. Select **Up to Next Major Version** and enter `4.0.2`
 4. Choose **HawcxFramework** and click **Add Package**
 
 ### Package.swift
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/hawcx/hawcx-sdk-ios", from: "4.0.0")
+    .package(url: "https://github.com/hawcx/hawcx_ios_sdk.git", from: "4.0.2")
 ]
 ```
 
 ### Manual Installation
 
-1. Download the latest [HawcxFramework.xcframework](https://github.com/hawcx/hawcx_sdk_ios/releases/latest)
+1. Download the latest [HawcxFramework.xcframework](https://github.com/hawcx/hawcx_ios_sdk/releases/latest)
 2. Drag the XCFramework into your project
 3. Set "Embed & Sign" in "Frameworks, Libraries, and Embedded Content"
 
