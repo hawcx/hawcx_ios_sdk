@@ -57,7 +57,7 @@ dependencies: [
 
 ### Manual Installation
 
-1. Download the latest [HawcxFramework.xcframework](https://github.com/hawcx/hawcx-sdk-ios/releases/latest)
+1. Download the latest [HawcxFramework.xcframework](https://github.com/hawcx/hawcx_sdk_ios/releases/latest)
 2. Drag the XCFramework into your project
 3. Set "Embed & Sign" in "Frameworks, Libraries, and Embedded Content"
 
@@ -377,7 +377,7 @@ public protocol WebLoginCallback: AnyObject {
 
 ### Demo Application
 
-Explore our [V4 demo application](https://github.com/hawcx/hawcx-ios-demo) featuring:
+Explore our [V4 demo application](https://github.com/hawcx/hawcx_ios_demo) featuring:
 - Unified authentication implementation
 - Biometric integration
 - Session management
