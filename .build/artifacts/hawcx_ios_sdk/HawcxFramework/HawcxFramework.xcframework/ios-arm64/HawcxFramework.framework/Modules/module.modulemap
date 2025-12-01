@@ -1,0 +1,6 @@
+framework module HawcxFramework {
+  umbrella header "HawcxFramework.h"
+  export *
+
+  module * { export * }
+}
