@@ -14,8 +14,8 @@ let package = Package(
     targets: [
         .binaryTarget(
             name: "HawcxFramework",
-            url: "https://github.com/hawcx/hawcx_ios_sdk/releases/download/5.2.2/HawcxFramework.xcframework.zip",
-            checksum: "9637230848639ebf8d6a0c41836a9276dd869ad6b4b2aea3fdde45ae62388a84"
+            url: "https://github.com/hawcx/hawcx_ios_sdk/releases/download/5.2.3/HawcxFramework.xcframework.zip",
+            checksum: "5e1a29f2455186eef8c4f59c03a676ee876ea6566c2cd3eb56e7fcaa8703193d"
         )
     ]
 )
