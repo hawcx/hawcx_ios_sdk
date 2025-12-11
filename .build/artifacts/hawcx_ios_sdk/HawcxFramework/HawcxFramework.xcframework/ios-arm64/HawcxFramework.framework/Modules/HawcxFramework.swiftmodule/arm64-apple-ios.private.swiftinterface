@@ -1,0 +1,312 @@
+// swift-interface-format-version: 1.0
+// swift-compiler-version: Apple Swift version 6.2 effective-5.10 (swiftlang-6.2.0.19.9 clang-1700.3.19.1)
+// swift-module-flags: -target arm64-apple-ios17.5 -enable-objc-interop -enable-library-evolution -swift-version 5 -enforce-exclusivity=checked -O -enable-experimental-feature DebugDescriptionMacro -enable-bare-slash-regex -module-name HawcxFramework
+// swift-module-flags-ignorable:  -formal-cxx-interoperability-mode=off -interface-compiler-version 6.2
+import CommonCrypto
+import CryptoKit
+import Foundation
+@_exported import HawcxFramework
+import LocalAuthentication
+import Security
+import Swift
+import UIKit
+import UserNotifications
+import _Concurrency
+import _StringProcessing
+import _SwiftConcurrencyShims
+import os
+public struct PushLoginRequestDetails : Swift.Codable {
+  public let requestId: Swift.String
+  public let ipAddress: Swift.String
+  public let location: Swift.String?
+  public let deviceInfo: Swift.String
+  public let timestamp: Swift.String
+  public func encode(to encoder: any Swift.Encoder) throws
+  public init(from decoder: any Swift.Decoder) throws
+}
+public struct PlatformDetailsV1 : Swift.Codable {
+  public let platform: Swift.String?
+  public let platformVersion: Swift.String?
+  public let architecture: Swift.String?
+  public func encode(to encoder: any Swift.Encoder) throws
+  public init(from decoder: any Swift.Decoder) throws
+}
+public struct HardwareInfoV1 : Swift.Codable {
+  public let cpuCores: Swift.Int?
+  public let memory: Swift.Int?
+  public let graphicsVendor: Swift.String?
+  public let touchSupport: Swift.Bool?
+  public func encode(to encoder: any Swift.Encoder) throws
+  public init(from decoder: any Swift.Decoder) throws
+}
+public struct BrowserSignalsV1 : Swift.Codable {
+  public let userAgent: Swift.String?
+  public let browserName: Swift.String?
+  public let browserVersion: Swift.String?
+  public let browserMajorVersion: Swift.String?
+  public let vendor: Swift.String?
+  public let platform: Swift.String?
+  public let languages: [Swift.String]?
+  public let plugins: [Swift.String]?
+  public let mimeTypes: [Swift.String]?
+  public let canvasFingerprint: Swift.String?
+  public let webglFingerprint: Swift.String?
+  public let webglVendor: Swift.String?
+  public let webglRenderer: Swift.String?
+  public func encode(to encoder: any Swift.Encoder) throws
+  public init(from decoder: any Swift.Decoder) throws
+}
+public struct DeviceInfoPayload : Swift.Codable {
+  public let fpVersion: Swift.String?
+  public let hardwareInfo: HawcxFramework.HardwareInfoV1?
+  public let browserSignals: HawcxFramework.BrowserSignalsV1?
+  public let platformDetails: HawcxFramework.PlatformDetailsV1?
+  public func encode(to encoder: any Swift.Encoder) throws
+  public init(from decoder: any Swift.Decoder) throws
+}
+public struct SessionDetails : Swift.Codable {
+  public let deviceId: Swift.String?
+  public let deviceInfo: HawcxFramework.DeviceInfoPayload?
+  public let ipDetails: Swift.String?
+  public let isp: Swift.String?
+  public let city: Swift.String?
+  public let state: Swift.String?
+  public let country: Swift.String?
+  #if compiler(>=5.3) && $NonescapableTypes
+  public var derivedOsDetails: Swift.String? {
+    get
+  }
+  #endif
+  #if compiler(>=5.3) && $NonescapableTypes
+  public var derivedBrowserWithVersion: Swift.String? {
+    get
+  }
+  #endif
+  #if compiler(>=5.3) && $NonescapableTypes
+  public var derivedDeviceType: Swift.String? {
+    get
+  }
+  #endif
+  #if compiler(>=5.3) && $NonescapableTypes
+  public var derivedLocation: Swift.String? {
+    get
+  }
+  #endif
+  public func encode(to encoder: any Swift.Encoder) throws
+  public init(from decoder: any Swift.Decoder) throws
+}
+public struct Device : Swift.Codable, Swift.Identifiable, Swift.Hashable {
+  public var id: Foundation.UUID
+  public let devId: Swift.String?
+  public let platform: Swift.String?
+  public let browserName: Swift.String?
+  public let model: Swift.String?
+  public let osVersion: Swift.String?
+  public let loginTime: Swift.String?
+  #if compiler(>=5.3) && $NonescapableTypes
+  public var osDetails: Swift.String? {
+    get
+  }
+  #endif
+  #if compiler(>=5.3) && $NonescapableTypes
+  public var browserWithVersion: Swift.String? {
+    get
+  }
+  #endif
+  #if compiler(>=5.3) && $NonescapableTypes
+  public var deviceType: Swift.String? {
+    get
+  }
+  #endif
+  #if compiler(>=5.3) && $NonescapableTypes
+  public var sessionDetails: [HawcxFramework.Session]? {
+    get
+  }
+  #endif
+  public static func == (lhs: HawcxFramework.Device, rhs: HawcxFramework.Device) -> Swift.Bool
+  public func hash(into hasher: inout Swift.Hasher)
+  #if compiler(>=5.3) && $NonescapableTypes
+  public init(id: Foundation.UUID = UUID(), devId: Swift.String?, platform: Swift.String? = nil, browserName: Swift.String? = nil, model: Swift.String? = nil, osVersion: Swift.String? = nil, loginTime: Swift.String? = nil)
+  #endif
+  #if compiler(>=5.3) && $NonescapableTypes
+  public init(id: Foundation.UUID = UUID(), devId: Swift.String?, osDetails: Swift.String?, browserWithVersion: Swift.String?, deviceType: Swift.String?, sessionDetails: [HawcxFramework.Session]?)
+  #endif
+  public typealias ID = Foundation.UUID
+  public func encode(to encoder: any Swift.Encoder) throws
+  public var hashValue: Swift.Int {
+    get
+  }
+  public init(from decoder: any Swift.Decoder) throws
+}
+public struct Session : Swift.Codable, Swift.Identifiable, Swift.Hashable {
+  public var id: Foundation.UUID
+  public let country: Swift.String
+  public let ipDetails: Swift.String
+  public let isp: Swift.String
+  public let sessionLoginTime: Swift.String
+  public let osDetails: Swift.String
+  public init(id: Foundation.UUID = UUID(), country: Swift.String, ipDetails: Swift.String, isp: Swift.String, sessionLoginTime: Swift.String, osDetails: Swift.String)
+  public static func == (a: HawcxFramework.Session, b: HawcxFramework.Session) -> Swift.Bool
+  public typealias ID = Foundation.UUID
+  public func encode(to encoder: any Swift.Encoder) throws
+  public func hash(into hasher: inout Swift.Hasher)
+  public var hashValue: Swift.Int {
+    get
+  }
+  public init(from decoder: any Swift.Decoder) throws
+}
+public protocol DevSessionCallback {
+  func onSuccess()
+  func showError()
+}
+@_hasMissingDesignatedInitializers public class SDKLogger {
+  public enum LogLevel {
+    case debug, info, warning, error
+    public static func == (a: HawcxFramework.SDKLogger.LogLevel, b: HawcxFramework.SDKLogger.LogLevel) -> Swift.Bool
+    public func hash(into hasher: inout Swift.Hasher)
+    public var hashValue: Swift.Int {
+      get
+    }
+  }
+  @objc deinit
+}
+public enum AuthV4ErrorCode : Swift.String, Swift.Error {
+  case networkError
+  case unknownError
+  case invalidInput
+  case keychainSaveFailed
+  case clientCryptoError
+  case internalStateError
+  case authInitFailed
+  case otpVerificationFailed
+  case missingDeviceTokenSession
+  case deviceVerificationFailed
+  case missingEr1r2ForRegistration
+  case cipherVerificationFailed
+  case missingCryptoForLogin
+  case missingPersistentDeviceToken
+  case oauthConfigurationMissing
+  case oauthExchangeFailed
+  case oauthTokenVerificationFailed
+  case fingerprintError
+  #if compiler(>=5.3) && $NonescapableTypes
+  public init?(rawValue: Swift.String)
+  #endif
+  public typealias RawValue = Swift.String
+  public var rawValue: Swift.String {
+    get
+  }
+}
+public enum WebLoginErrorCode : Swift.String, Swift.Error {
+  case unknownError
+  case invalidPin
+  case failedApprove
+  case networkError
+  #if compiler(>=5.3) && $NonescapableTypes
+  public init?(rawValue: Swift.String)
+  #endif
+  public typealias RawValue = Swift.String
+  public var rawValue: Swift.String {
+    get
+  }
+}
+public protocol AuthV4Callback : AnyObject {
+  func onOtpRequired()
+  #if compiler(>=5.3) && $NonescapableTypes
+  func onAuthSuccess(accessToken: Swift.String?, refreshToken: Swift.String?, isLoginFlow: Swift.Bool)
+  #endif
+  func onError(errorCode: HawcxFramework.AuthV4ErrorCode, errorMessage: Swift.String)
+}
+public enum AuthV5ErrorCode : Swift.String, Swift.Error {
+  case networkError
+  case unknownError
+  case invalidInput
+  case internalStateError
+  case authInitFailed
+  case otpVerificationFailed
+  case deviceVerificationFailed
+  case loginIntegrityFailed
+  case cryptoError
+  case secureStorageError
+  case missingRegistrationContext
+  case tokenStorageFailed
+  case oauthConfigurationMissing
+  case oauthExchangeFailed
+  case oauthTokenVerificationFailed
+  #if compiler(>=5.3) && $NonescapableTypes
+  public init?(rawValue: Swift.String)
+  #endif
+  public typealias RawValue = Swift.String
+  public var rawValue: Swift.String {
+    get
+  }
+}
+public protocol AuthV5Callback : AnyObject {
+  func onOtpRequired()
+  #if compiler(>=5.3) && $NonescapableTypes
+  func onAuthSuccess(accessToken: Swift.String?, refreshToken: Swift.String?, isLoginFlow: Swift.Bool)
+  #endif
+  func onError(errorCode: HawcxFramework.AuthV5ErrorCode, errorMessage: Swift.String)
+  #if compiler(>=5.3) && $NonescapableTypes
+  func onAuthorizationCode(code: Swift.String, expiresIn: Swift.Int?)
+  #endif
+  #if compiler(>=5.3) && $NonescapableTypes
+  func onAdditionalVerificationRequired(sessionId: Swift.String, detail: Swift.String?)
+  #endif
+}
+public protocol HawcxPushAuthDelegate : AnyObject {
+  func hawcx(didReceiveLoginRequest requestId: Swift.String, details: HawcxFramework.PushLoginRequestDetails)
+  func hawcx(failedToFetchLoginRequestDetails error: any Swift.Error)
+}
+public class HawcxSDK {
+  weak public var pushAuthDelegate: (any HawcxFramework.HawcxPushAuthDelegate)?
+  #if compiler(>=5.3) && $NonescapableTypes
+  public init(projectApiKey: Swift.String, baseURL: Swift.String, oauthConfig: HawcxFramework.HawcxOAuthConfig? = nil)
+  #endif
+  public func authenticateV4(userid: Swift.String, callback: any HawcxFramework.AuthV4Callback)
+  public func submitOtpV4(otp: Swift.String)
+  public func authenticateV5(userid: Swift.String, callback: any HawcxFramework.AuthV5Callback)
+  public func submitOtpV5(otp: Swift.String)
+  public func getDeviceDetails(callback: any HawcxFramework.DevSessionCallback)
+  public func webLogin(pin: Swift.String, callback: any HawcxFramework.WebLoginCallback)
+  public func webApprove(token: Swift.String, callback: any HawcxFramework.WebLoginCallback)
+  public func setAPNsDeviceToken(_ tokenData: Foundation.Data)
+  public func userDidAuthenticate()
+  public func handlePushNotification(userInfo: [Swift.AnyHashable : Any]) -> Swift.Bool
+  #if compiler(>=5.3) && $NonescapableTypes
+  public func approveLoginRequest(requestId: Swift.String, completion: @escaping ((any Swift.Error)?) -> Swift.Void)
+  #endif
+  #if compiler(>=5.3) && $NonescapableTypes
+  public func declineLoginRequest(requestId: Swift.String, completion: @escaping ((any Swift.Error)?) -> Swift.Void)
+  #endif
+  public func getLastLoggedInUser() -> Swift.String
+  #if compiler(>=5.3) && $NonescapableTypes
+  @discardableResult
+  public func storeBackendOAuthTokens(accessToken: Swift.String, refreshToken: Swift.String?, forUser userId: Swift.String) -> Swift.Bool
+  #endif
+  public func clearSessionTokens(forUser userid: Swift.String)
+  public func clearUserKeychainData(forUser userid: Swift.String)
+  public func clearLastLoggedInUser()
+  @objc deinit
+}
+public struct HawcxOAuthConfig {
+  public let tokenEndpoint: Foundation.URL
+  public let clientId: Swift.String
+  public let publicKeyPem: Swift.String
+  public init(tokenEndpoint: Foundation.URL, clientId: Swift.String, publicKeyPem: Swift.String)
+}
+public protocol WebLoginCallback {
+  func showError(webLoginErrorCode: HawcxFramework.WebLoginErrorCode, errorMessage: Swift.String)
+  func onSuccess()
+}
+extension HawcxFramework.SDKLogger.LogLevel : Swift.Equatable {}
+extension HawcxFramework.SDKLogger.LogLevel : Swift.Hashable {}
+extension HawcxFramework.AuthV4ErrorCode : Swift.Equatable {}
+extension HawcxFramework.AuthV4ErrorCode : Swift.Hashable {}
+extension HawcxFramework.AuthV4ErrorCode : Swift.RawRepresentable {}
+extension HawcxFramework.WebLoginErrorCode : Swift.Equatable {}
+extension HawcxFramework.WebLoginErrorCode : Swift.Hashable {}
+extension HawcxFramework.WebLoginErrorCode : Swift.RawRepresentable {}
+extension HawcxFramework.AuthV5ErrorCode : Swift.Equatable {}
+extension HawcxFramework.AuthV5ErrorCode : Swift.Hashable {}
+extension HawcxFramework.AuthV5ErrorCode : Swift.RawRepresentable {}
