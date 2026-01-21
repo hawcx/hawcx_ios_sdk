@@ -30,7 +30,7 @@
 		</data>
 		<key>Modules/HawcxFramework.swiftmodule/arm64-apple-ios-simulator.swiftmodule</key>
 		<data>
-		0CaPfQzJAqsjO3rH/08rndqU0gA=
+		v8spgCO5RCScNkLyrROujHaQ3ZY=
 		</data>
 		<key>Modules/HawcxFramework.swiftmodule/x86_64-apple-ios-simulator.abi.json</key>
 		<data>
@@ -50,7 +50,7 @@
 		</data>
 		<key>Modules/HawcxFramework.swiftmodule/x86_64-apple-ios-simulator.swiftmodule</key>
 		<data>
-		T/gTLbN+OqQsCyiniDo4/+xzyso=
+		B5CYP1lvwoBP/QhlrEtb15Zqnlg=
 		</data>
 		<key>Modules/module.modulemap</key>
 		<data>
@@ -98,7 +98,7 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			S9wArO7pPKtxq0OBVrjo8v5CQllidJHMtXfoUulzyCo=
+			Adr3+OhrQwksqJjW0mqkN+gkEpJumRTpivDzur2ayHw=
 			</data>
 		</dict>
 		<key>Modules/HawcxFramework.swiftmodule/x86_64-apple-ios-simulator.abi.json</key>
@@ -133,7 +133,7 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			Wi4l5uboGxmiQshbl5RjLA/jcdEj67rpTatY+yw/pO0=
+			yj+CbdOVcCuCjCr2YKuJ50nTQkjPuO38POrkoJOaIiI=
 			</data>
 		</dict>
 		<key>Modules/module.modulemap</key>

@@ -15,9 +15,9 @@
         },
         "path" : "/Users/agambhullar/prod_ios/hawcx_ios_sdk/.build/artifacts/hawcx_ios_sdk/HawcxFramework/HawcxFramework.xcframework",
         "source" : {
-          "checksum" : "5e1a29f2455186eef8c4f59c03a676ee876ea6566c2cd3eb56e7fcaa8703193d",
+          "checksum" : "2070ee07f440c535833cbb40415864a788751151a4ba642ec4fc2783004ecb09",
           "type" : "remote",
-          "url" : "https://github.com/hawcx/hawcx_ios_sdk/releases/download/5.2.3/HawcxFramework.xcframework.zip"
+          "url" : "https://github.com/hawcx/hawcx_ios_sdk/releases/download/5.2.4/HawcxFramework.xcframework.zip"
         },
         "targetName" : "HawcxFramework"
       }
