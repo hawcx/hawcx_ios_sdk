@@ -72,22 +72,22 @@ public struct SessionDetails : Swift.Codable {
   public let city: Swift.String?
   public let state: Swift.String?
   public let country: Swift.String?
-  #if compiler(>=5.3) && $NonescapableTypes
+  #if compiler(>=5.3)
   public var derivedOsDetails: Swift.String? {
     get
   }
   #endif
-  #if compiler(>=5.3) && $NonescapableTypes
+  #if compiler(>=5.3)
   public var derivedBrowserWithVersion: Swift.String? {
     get
   }
   #endif
-  #if compiler(>=5.3) && $NonescapableTypes
+  #if compiler(>=5.3)
   public var derivedDeviceType: Swift.String? {
     get
   }
   #endif
-  #if compiler(>=5.3) && $NonescapableTypes
+  #if compiler(>=5.3)
   public var derivedLocation: Swift.String? {
     get
   }
@@ -103,32 +103,32 @@ public struct Device : Swift.Codable, Swift.Identifiable, Swift.Hashable {
   public let model: Swift.String?
   public let osVersion: Swift.String?
   public let loginTime: Swift.String?
-  #if compiler(>=5.3) && $NonescapableTypes
+  #if compiler(>=5.3)
   public var osDetails: Swift.String? {
     get
   }
   #endif
-  #if compiler(>=5.3) && $NonescapableTypes
+  #if compiler(>=5.3)
   public var browserWithVersion: Swift.String? {
     get
   }
   #endif
-  #if compiler(>=5.3) && $NonescapableTypes
+  #if compiler(>=5.3)
   public var deviceType: Swift.String? {
     get
   }
   #endif
-  #if compiler(>=5.3) && $NonescapableTypes
+  #if compiler(>=5.3)
   public var sessionDetails: [HawcxFramework.Session]? {
     get
   }
   #endif
   public static func == (lhs: HawcxFramework.Device, rhs: HawcxFramework.Device) -> Swift.Bool
   public func hash(into hasher: inout Swift.Hasher)
-  #if compiler(>=5.3) && $NonescapableTypes
+  #if compiler(>=5.3)
   public init(id: Foundation.UUID = UUID(), devId: Swift.String?, platform: Swift.String? = nil, browserName: Swift.String? = nil, model: Swift.String? = nil, osVersion: Swift.String? = nil, loginTime: Swift.String? = nil)
   #endif
-  #if compiler(>=5.3) && $NonescapableTypes
+  #if compiler(>=5.3)
   public init(id: Foundation.UUID = UUID(), devId: Swift.String?, osDetails: Swift.String?, browserWithVersion: Swift.String?, deviceType: Swift.String?, sessionDetails: [HawcxFramework.Session]?)
   #endif
   public typealias ID = Foundation.UUID
@@ -189,7 +189,7 @@ public enum AuthV4ErrorCode : Swift.String, Swift.Error {
   case oauthExchangeFailed
   case oauthTokenVerificationFailed
   case fingerprintError
-  #if compiler(>=5.3) && $NonescapableTypes
+  #if compiler(>=5.3)
   public init?(rawValue: Swift.String)
   #endif
   public typealias RawValue = Swift.String
@@ -202,7 +202,7 @@ public enum WebLoginErrorCode : Swift.String, Swift.Error {
   case invalidPin
   case failedApprove
   case networkError
-  #if compiler(>=5.3) && $NonescapableTypes
+  #if compiler(>=5.3)
   public init?(rawValue: Swift.String)
   #endif
   public typealias RawValue = Swift.String
@@ -212,7 +212,7 @@ public enum WebLoginErrorCode : Swift.String, Swift.Error {
 }
 public protocol AuthV4Callback : AnyObject {
   func onOtpRequired()
-  #if compiler(>=5.3) && $NonescapableTypes
+  #if compiler(>=5.3)
   func onAuthSuccess(accessToken: Swift.String?, refreshToken: Swift.String?, isLoginFlow: Swift.Bool)
   #endif
   func onError(errorCode: HawcxFramework.AuthV4ErrorCode, errorMessage: Swift.String)
@@ -233,7 +233,7 @@ public enum AuthV5ErrorCode : Swift.String, Swift.Error {
   case oauthConfigurationMissing
   case oauthExchangeFailed
   case oauthTokenVerificationFailed
-  #if compiler(>=5.3) && $NonescapableTypes
+  #if compiler(>=5.3)
   public init?(rawValue: Swift.String)
   #endif
   public typealias RawValue = Swift.String
@@ -243,14 +243,14 @@ public enum AuthV5ErrorCode : Swift.String, Swift.Error {
 }
 public protocol AuthV5Callback : AnyObject {
   func onOtpRequired()
-  #if compiler(>=5.3) && $NonescapableTypes
+  #if compiler(>=5.3)
   func onAuthSuccess(accessToken: Swift.String?, refreshToken: Swift.String?, isLoginFlow: Swift.Bool)
   #endif
   func onError(errorCode: HawcxFramework.AuthV5ErrorCode, errorMessage: Swift.String)
-  #if compiler(>=5.3) && $NonescapableTypes
+  #if compiler(>=5.3)
   func onAuthorizationCode(code: Swift.String, expiresIn: Swift.Int?)
   #endif
-  #if compiler(>=5.3) && $NonescapableTypes
+  #if compiler(>=5.3)
   func onAdditionalVerificationRequired(sessionId: Swift.String, detail: Swift.String?)
   #endif
 }
@@ -260,7 +260,7 @@ public protocol HawcxPushAuthDelegate : AnyObject {
 }
 public class HawcxSDK {
   weak public var pushAuthDelegate: (any HawcxFramework.HawcxPushAuthDelegate)?
-  #if compiler(>=5.3) && $NonescapableTypes
+  #if compiler(>=5.3)
   public init(projectApiKey: Swift.String, baseURL: Swift.String, oauthConfig: HawcxFramework.HawcxOAuthConfig? = nil)
   #endif
   public func authenticateV4(userid: Swift.String, callback: any HawcxFramework.AuthV4Callback)
@@ -273,14 +273,14 @@ public class HawcxSDK {
   public func setAPNsDeviceToken(_ tokenData: Foundation.Data)
   public func userDidAuthenticate()
   public func handlePushNotification(userInfo: [Swift.AnyHashable : Any]) -> Swift.Bool
-  #if compiler(>=5.3) && $NonescapableTypes
+  #if compiler(>=5.3)
   public func approveLoginRequest(requestId: Swift.String, completion: @escaping ((any Swift.Error)?) -> Swift.Void)
   #endif
-  #if compiler(>=5.3) && $NonescapableTypes
+  #if compiler(>=5.3)
   public func declineLoginRequest(requestId: Swift.String, completion: @escaping ((any Swift.Error)?) -> Swift.Void)
   #endif
   public func getLastLoggedInUser() -> Swift.String
-  #if compiler(>=5.3) && $NonescapableTypes
+  #if compiler(>=5.3)
   @discardableResult
   public func storeBackendOAuthTokens(accessToken: Swift.String, refreshToken: Swift.String?, forUser userId: Swift.String) -> Swift.Bool
   #endif
