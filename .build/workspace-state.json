@@ -1,26 +1,7 @@
 {
   "object" : {
     "artifacts" : [
-      {
-        "kind" : {
-          "xcframework" : {
 
-          }
-        },
-        "packageRef" : {
-          "identity" : "hawcx_ios_sdk",
-          "kind" : "root",
-          "location" : "/Users/agambhullar/prod_ios/hawcx_ios_sdk",
-          "name" : "hawcx_ios_sdk"
-        },
-        "path" : "/Users/agambhullar/prod_ios/hawcx_ios_sdk/.build/artifacts/hawcx_ios_sdk/HawcxFramework/HawcxFramework.xcframework",
-        "source" : {
-          "checksum" : "1dd087785546318c6bc76f152449e481adffd94beda24b2c7f9fbe62e3ba72c5",
-          "type" : "remote",
-          "url" : "https://github.com/hawcx/hawcx_ios_sdk/releases/download/6.0.1/HawcxFramework.xcframework.zip"
-        },
-        "targetName" : "HawcxFramework"
-      }
     ],
     "dependencies" : [
 

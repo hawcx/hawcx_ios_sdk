@@ -1,26 +1,35 @@
 # Hawcx iOS SDK V6.0.2
 
-Hawcx delivers enterprise-grade passwordless authentication for iOS with a unified V5 flow that mirrors the Android SDK and the latest Hawcx backend.
+Hawcx delivers passwordless authentication for iOS with an adaptive V6 flow for new integrations, while keeping existing V4/V5 APIs available for apps that are already in production.
 
 [![Swift Version](https://img.shields.io/badge/Swift-5.9+-orange.svg)](https://swift.org)
 [![Platform](https://img.shields.io/badge/platform-iOS_17.0+-blue.svg)](https://developer.apple.com/ios/)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Swift Package Manager](https://img.shields.io/badge/SPM-compatible-brightgreen.svg)](https://swift.org/package-manager)
 
-## What's New in V5
+## What This Release Includes
 
-- Hardware-backed security – Secure Enclave + HKDF salts wrap the Ed25519 keyset and store secrets in Keychain.
-- OAuth-backed login – A single V5 flow (`authenticateV5` / `submitOtpV5`) returns OAuth codes or JWTs that align with the Hawcx server stack.
-- Unified cross-platform API – Method signatures and callbacks match the Android SDK for smoother multi-platform adoption.
+- V6 adaptive authentication via `HawcxV1SDK`
+- Trusted-device handling and secure device credentials managed by the SDK
+- Optional OAuth redirect and exchange helpers for V6 flows
+- Existing `HawcxSDK` V4/V5 APIs for current integrations and incremental migration
 
-## Installation (SPM)
+## Requirements
 
-Requirements: iOS 17.0+, Swift 5.9+.
+- iOS 17.0+
+- Swift 5.9+
 
-1) In Xcode, go to **File → Add Package Dependencies...**  
-2) Enter: `https://github.com/hawcx/hawcx_ios_sdk.git`  
-3) Choose **Up to Next Major Version** and set `6.0.2` (or `5.2` tag).  
-4) Select the product **HawcxFramework**.
+## Installation
+
+### Swift Package Manager
+
+In Xcode:
+
+1. Go to **File → Add Package Dependencies...**
+2. Enter: `https://github.com/hawcx/hawcx_ios_sdk.git`
+3. Choose **Up to Next Major Version**
+4. Set the version to `6.0.2`
+5. Select the product **HawcxFramework**
 
 Using `Package.swift` directly:
 
@@ -30,115 +39,194 @@ dependencies: [
 ]
 ```
 
-Manual option: download `HawcxFramework.xcframework.zip` from the [6.0.2 release](https://github.com/hawcx/hawcx_ios_sdk/releases/6.0.2), unzip, and embed the XCFramework with “Embed & Sign”.
+### Manual XCFramework
 
-## Getting Started (V5)
+Download `HawcxFramework.xcframework.zip` from the [6.0.2 release](https://github.com/hawcx/hawcx_ios_sdk/releases/download/6.0.2/HawcxFramework.xcframework.zip), unzip it, and add `HawcxFramework.xcframework` to your Xcode project with **Embed & Sign**.
 
-`baseURL` should be the host Hawcx provisioned for your tenant (scheme + host only is fine, e.g., `https://hawcx-api.hawcx.com`). The SDK appends `/hc_auth` and derives all V4/V5 endpoints from that host.
+## V6 Quick Start
+
+V6 is the public release name. The current iOS API surface uses `HawcxV1SDK` and related `HawcxV1*` types because the SDK is built on Hawcx protocol v1.
 
 ```swift
 import HawcxFramework
 
-let oauthConfig = HawcxOAuthConfig(
-    tokenEndpoint: URL(string: "https://hawcx-api.hawcx.com/hc_auth/v5/oauth/token")!,
-    clientId: "hawcx-mobile",
-    publicKeyPem: """
-    -----BEGIN PUBLIC KEY-----
-    ...
-    -----END PUBLIC KEY-----
-    """
-)
-
-// If you omit oauthConfig, the SDK will call onAuthorizationCode(...) so you can redeem the code yourself.
-let sdk = HawcxSDK(
-    projectApiKey: "<HAWCX_PROJECT_API_KEY>",
-    baseURL: "https://hawcx-api.hawcx.com",
-    oauthConfig: oauthConfig // optional
+let hawcx = HawcxV1SDK(
+    configId: "<YOUR_CONFIG_ID>",
+    baseURL: URL(string: "https://your-hawcx-host.example.com")!,
+    primaryMethodSelectionPolicy: .automaticFromIdentifier
 )
 ```
 
-### V5 Authentication Flow
+### Initialization Notes
+
+- `configId` is the Hawcx value provisioned for this integration. In current public releases, this is the same value you may receive as your project API key / Config ID.
+- `baseURL` should point to your Hawcx tenant host. You can pass either the host root or an existing `/v1` URL. The SDK normalizes it automatically. Do not append `/auth` yourself.
+- `primaryMethodSelectionPolicy` defaults to `.manual`. The quick-start example opts into `.automaticFromIdentifier`.
+- `relyingParty` is optional and should only be set when your backend expects the `X-Relying-Party` header.
+- `autoPollApprovals` defaults to `true`, which is the right choice for most apps.
+- `.automaticFromIdentifier` only auto-selects the initial primary method during `.signin` when the identifier already makes the correct email or phone path obvious.
+
+## How V6 Works
+
+1. Initialize `HawcxV1SDK` with your `configId` and tenant base URL.
+2. Start a flow, usually `.signin`, with the user's identifier.
+3. Render the prompt Hawcx returns.
+4. Send the user's input back to the SDK.
+5. Exchange the resulting authorization code on your backend.
+
+The SDK handles protocol requests, PKCE when needed, trusted-device storage, internal device-trust processing, and approval polling.
+
+## Starting Authentication
+
+`HawcxV1FlowType` supports:
+
+- `.signin`
+- `.signup`
+- `.accountManage`
+
+Most apps should start with `.signin`:
 
 ```swift
-final class AuthController: UIViewController, AuthV5Callback {
-    private let sdk: HawcxSDK = {
-        // Configure once, reuse across the app.
-        let config = HawcxOAuthConfig(
-            tokenEndpoint: URL(string: "https://hawcx-api.hawcx.com/hc_auth/v5/oauth/token")!,
-            clientId: "hawcx-mobile",
-            publicKeyPem: "<PEM_PUBLIC_KEY>"
-        )
-        return HawcxSDK(
-            projectApiKey: "<PROJECT_API_KEY>",
-            baseURL: "https://hawcx-api.hawcx.com",
-            oauthConfig: config
-        )
-    }()
-
-    func startLogin(email: String) {
-        sdk.authenticateV5(userid: email, callback: self)
-    }
-
-    // MARK: - AuthV5Callback
-    func onOtpRequired() {
-        // Prompt user for the OTP, then call submitOtpV5(...)
-    }
-
-    func onAuthorizationCode(code: String, expiresIn: Int?) {
-        // Only fired when no oauthConfig is provided. Exchange the code with your OAuth service, then continue your login flow.
-    }
-
-    func onAuthSuccess(accessToken: String?, refreshToken: String?, isLoginFlow: Bool) {
-        // Tokens are also persisted securely. Use them immediately or load from the credential store later.
-    }
-
-    func onAdditionalVerificationRequired(sessionId: String, detail: String?) {
-        // Present any required step-up / web approval UI.
-    }
-
-    func onError(errorCode: AuthV5ErrorCode, errorMessage: String) {
-        // Surface to the user or log for analytics.
-    }
-}
-
-// Submit OTP after the user types it
-// sdk.submitOtpV5(otp: "<OTP_FROM_USER>")
+hawcx.start(flowType: .signin, identifier: "user@example.com")
 ```
 
-- Device registration provisions salts, wraps keys with Secure Enclave metadata, and records device fingerprint data.  
-- Returning users reuse stored material and only request an OTP when needed.  
-- Tokens and the last logged-in user are persisted in Keychain-backed storage.
-
-## Push Notifications (optional)
-
-- In `application(_:didRegisterForRemoteNotificationsWithDeviceToken:)` forward the token:  
-  `sdk.setAPNsDeviceToken(deviceToken)`
-- After a successful V5 login/registration, call `sdk.userDidAuthenticate()` so the SDK binds the APNs token to the user.
-- To handle Hawcx login push payloads inside `didReceiveRemoteNotification`, call `sdk.handlePushNotification(userInfo)`; it returns `true` when the payload belongs to Hawcx.
-
-## Backwards Compatibility (V4)
-
-V4 APIs (`authenticateV4`, `submitOtpV4`, web login, session utilities) remain for existing deployments. They share the same package and binary.
+Additional fields are available when your tenant policy requires them:
 
 ```swift
-let sdk = HawcxSDK(
-    projectApiKey: "<PROJECT_API_KEY>",
-    baseURL: "https://hawcx-api.hawcx.com"
+hawcx.start(
+    flowType: .signin,
+    identifier: "user@example.com",
+    startToken: "<optional-start-token>",
+    inviteCode: "12345678"
 )
+```
 
-class LegacyController: AuthV4Callback {
-    func start(email: String) {
-        sdk.authenticateV4(userid: email, callback: self)
+`startToken` is optional and is only needed when your backend or hosted flow gives your app a pre-issued token to resume or continue a specific start path.
+
+If you omit `codeChallenge`, the SDK generates PKCE automatically and returns `codeVerifier` in the completed update.
+
+## Handling Flow Updates
+
+Use `flow.onUpdate` to drive your UI:
+
+```swift
+hawcx.flow.onUpdate = { update in
+    switch update {
+    case .idle:
+        break
+
+    case .loading:
+        break
+
+    case let .prompt(context, prompt):
+        switch prompt {
+        case let .selectMethod(methods, _):
+            print(methods.map(\.id))
+
+        case let .enterCode(destination, _, _, _, resendAt):
+            print(destination, resendAt ?? "")
+
+        case let .setupSms(existingPhone):
+            print(existingPhone ?? "")
+
+        case let .setupTotp(secret, otpauthUrl, _):
+            print(secret, otpauthUrl)
+
+        case .enterTotp:
+            break
+
+        case let .redirect(url, returnScheme):
+            print(url, returnScheme ?? "")
+
+        case let .awaitApproval(qrData, expiresAt, pollInterval):
+            print(qrData ?? "", expiresAt, pollInterval)
+        }
+
+        print(context.meta.traceId)
+
+    case let .completed(session, authCode, expiresAt, codeVerifier, _):
+        print(session, authCode, expiresAt, codeVerifier ?? "")
+
+    case let .error(_, code, action, message, retryable, details, meta):
+        print(code, action as Any, message, retryable, details as Any, meta?.traceId ?? "")
     }
-    func onOtpRequired() { /* prompt user */ }
-    func onAuthSuccess(accessToken: String?, refreshToken: String?, isLoginFlow: Bool) { /* handle */ }
-    func onError(errorCode: AuthV4ErrorCode, errorMessage: String) { /* handle */ }
 }
 ```
+
+Internal device-trust prompts are handled by the SDK automatically and should not be rendered in your UI.
+
+## Redirect Handling
+
+If the backend returns a `redirect` prompt, use the provided OAuth helpers:
+
+```swift
+import AuthenticationServices
+import HawcxFramework
+import UIKit
+
+let redirectSession = HawcxV1OAuthRedirectSession {
+    UIApplication.shared.connectedScenes
+        .compactMap { $0 as? UIWindowScene }
+        .flatMap(\.windows)
+        .first(where: \.isKeyWindow) ?? ASPresentationAnchor()
+}
+
+func handleRedirect(url: String, returnScheme: String) {
+    guard let redirectURL = URL(string: url) else { return }
+
+    redirectSession.start(url: redirectURL, callbackScheme: returnScheme) { result in
+        switch result {
+        case let .success(callbackURL):
+            if let callback = HawcxV1OAuthCallbackParser.parse(callbackURL) {
+                hawcx.flow.oauthCallback(code: callback.code, state: callback.state)
+            }
+        case .failure:
+            break
+        }
+    }
+}
+```
+
+## Backend Exchange
+
+When the flow completes, the SDK returns:
+
+- `session`
+- `authCode`
+- `expiresAt`
+- `codeVerifier` when PKCE was generated by the SDK
+
+For most apps, send the authorization code to your backend and do the exchange there. Keep OAuth client credentials and token verification on the server.
+
+If you truly need an SDK-managed exchange path, `HawcxV1OAuthExchangeService` is available as an advanced option. It verifies the returned ID token using the public key in your `HawcxOAuthConfig` and returns `HawcxV1OAuthToken` (`idToken`, `tokenType`, `expiresIn`).
+
+## Trusted Devices and Secure Storage
+
+The SDK manages trusted-device material for you:
+
+- device-trust steps are handled internally
+- device credentials are stored per app, per user, and per Hawcx project / Config ID
+- secure storage is isolated so the same user in different apps does not share credentials
+- invalid local trusted-device records are cleared and re-enrolled automatically when needed
+
+## Existing V4/V5 APIs
+
+This package still includes `HawcxSDK` for apps that already use the existing V4/V5 integration surface, including:
+
+- V4/V5 authentication flows
+- push approval handling
+- device session APIs
+- existing token-storage helpers
+
+That makes incremental migration possible: new V6 flows can live on `HawcxV1SDK` while existing utilities remain on `HawcxSDK`.
+
+## Documentation
+
+- [V6 iOS guide](https://docs.hawcx.com/docs/v1/sdk-reference/frontend/ios/sdk-v6)
+- [V5 iOS guide](https://docs.hawcx.com/docs/v1/sdk-reference/frontend/ios/sdk)
+- [Documentation home](https://docs.hawcx.com)
 
 ## Support
 
-- [Documentation](https://docs.hawcx.com)
-- [API Reference](https://docs.hawcx.com/ios/quickstart)
 - [Website](https://www.hawcx.com)
 - [Support Email](mailto:info@hawcx.com)
