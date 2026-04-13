@@ -1,4 +1,4 @@
-# Hawcx iOS SDK V6.0.2
+# Hawcx iOS SDK V6.0.3
 
 Hawcx delivers passwordless authentication for iOS with an adaptive V6 flow for new integrations, while keeping existing V4/V5 APIs available for apps that are already in production.
 
@@ -28,20 +28,20 @@ In Xcode:
 1. Go to **File → Add Package Dependencies...**
 2. Enter: `https://github.com/hawcx/hawcx_ios_sdk.git`
 3. Choose **Up to Next Major Version**
-4. Set the version to `6.0.2`
+4. Set the version to `6.0.3`
 5. Select the product **HawcxFramework**
 
 Using `Package.swift` directly:
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/hawcx/hawcx_ios_sdk.git", from: "6.0.2")
+    .package(url: "https://github.com/hawcx/hawcx_ios_sdk.git", from: "6.0.3")
 ]
 ```
 
 ### Manual XCFramework
 
-Download `HawcxFramework.xcframework.zip` from the [6.0.2 release](https://github.com/hawcx/hawcx_ios_sdk/releases/download/6.0.2/HawcxFramework.xcframework.zip), unzip it, and add `HawcxFramework.xcframework` to your Xcode project with **Embed & Sign**.
+Download `HawcxFramework.xcframework.zip` from the [6.0.3 release](https://github.com/hawcx/hawcx_ios_sdk/releases/download/6.0.3/HawcxFramework.xcframework.zip), unzip it, and add `HawcxFramework.xcframework` to your Xcode project with **Embed & Sign**.
 
 ## V6 Quick Start
 
